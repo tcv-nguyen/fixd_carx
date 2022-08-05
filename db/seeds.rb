@@ -6,6 +6,6 @@ require 'csv'
   model.delete_all
 
   CSV.parse(file, headers: true, liberal_parsing: true).each do |row|
-    model.create(row.to_h)
+    model.create(row.to_h.except('created_at', 'updated_at'))
   end
 end
