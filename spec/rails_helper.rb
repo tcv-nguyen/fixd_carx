@@ -44,7 +44,6 @@ RSpec.configure do |config|
   end
 
   config.before :each do
-    WebMock.reset!
     DatabaseCleaner.strategy = :transaction
   end
 
