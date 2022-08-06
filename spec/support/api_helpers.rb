@@ -1,5 +1,9 @@
 RSpec.configure do |config|
+  def response_body
+    JSON.parse(response.body)
+  end
+
   def response_message
-    JSON.parse(response.body)['message']
+    response_body['message']
   end
 end
