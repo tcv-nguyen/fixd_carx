@@ -9,9 +9,14 @@ class Rating < ApplicationRecord
   validates :user_id, uniqueness: { scope: :rater_id }
 
   before_create :generate_rated_at
+  after_create :recalculate_user_rating
 
   private
     def generate_rated_at
       self.rated_at ||= Time.current
+    end
+
+    def recalculate_user_rating
+      user.calculate_rating!
     end
 end
