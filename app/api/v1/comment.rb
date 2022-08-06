@@ -11,7 +11,15 @@ class Api::V1::Comment < Grape::API
     end
 
     delete do
-      { status: 'Delete Comment'}
+      comment = current_user.comments.find_by(id: params[:id])
+      if comment.blank?
+        error!({ message: 'Cannot find Comment' }, 422)
+      elsif comment.destroy
+        status 200
+        { message: 'Comment Deleted' }
+      else
+        error!({ message: comment.errors.full_messages.join('. ') }, 422)
+      end
     end
   end
 end
