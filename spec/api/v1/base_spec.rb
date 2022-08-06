@@ -12,7 +12,7 @@ describe 'Base API', type: :request do
       end
 
       it 'should return message' do
-        expect(response_message).to eq('Invalid API Token')
+        expect(response_message).to eq('Missing API Token')
       end
     end
 
