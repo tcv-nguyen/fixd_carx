@@ -21,7 +21,7 @@ describe 'Post API', type: :request do
     end
   end
 
-  describe 'create new Post without API token' do
+  describe 'create new Post with valid token' do
     let(:params) { valid_params }
 
     it 'should return status 200' do
@@ -33,7 +33,7 @@ describe 'Post API', type: :request do
     end
   end
 
-  describe 'create new Post missing data' do
+  describe 'create new Post with missing data' do
     describe 'with missing title' do
       let(:params) { valid_params.except(:title) }
 
