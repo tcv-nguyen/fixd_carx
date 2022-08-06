@@ -60,7 +60,7 @@ describe 'Comment API', type: :request do
           expect(response.status).to eq(422)
         end
 
-        it 'should return error message' do
+        it 'should return Post must exist error message' do
           expect(response_message).to eq('Post must exist')
         end
       end
@@ -95,7 +95,7 @@ describe 'Comment API', type: :request do
           expect(response.status).to eq(401)
         end
     
-        it 'should return invalid API token message' do
+        it 'should return Missing API token message' do
           expect(response_message).to eq('Missing API Token')
         end
       end

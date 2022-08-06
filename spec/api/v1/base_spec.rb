@@ -27,7 +27,7 @@ describe 'Base API', type: :request do
         expect(response.status).to eq(401)
       end
 
-      it 'should return message' do
+      it 'should return API Token expired message' do
         expect(response_message).to eq('API Token expired')
       end
     end

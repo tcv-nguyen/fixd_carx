@@ -42,9 +42,29 @@ describe 'User API V1', type: :request do
         end
       end
 
-      describe 'without user_id'
-      describe 'without rater_id'
-      describe 'with invalid rating'
+      describe 'without user_id' do
+        let(:params) { valid_params.except(:user_id) }
+    
+        it 'should return status 422' do
+          expect(response.status).to eq(422)
+        end
+    
+        it 'should return User must exist message' do
+          expect(response_message).to eq('User must exist')
+        end
+      end
+
+      describe 'with invalid rating' do
+        let(:params) { valid_params.merge(rating: 6) }
+    
+        it 'should return status 422' do
+          expect(response.status).to eq(422)
+        end
+    
+        it 'should return User must exist message' do
+          expect(response_message).to eq('Rating must be between 1 and 5')
+        end
+      end
     end
   end
 end
