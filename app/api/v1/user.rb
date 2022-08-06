@@ -1,7 +1,7 @@
 class Api::V1::User < Grape::API
   namespace :user do
     get :timeline do
-      current_user.timeline(*params.slice(:records, :offset))
+      current_user.timeline(params.slice(:records, :page).symbolize_keys)
     end
 
     post :rate do
