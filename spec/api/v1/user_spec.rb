@@ -67,4 +67,39 @@ describe 'User API V1', type: :request do
       end
     end
   end
+
+  describe 'GET timeline' do
+    let(:user) { create(:user, with_api_token: true) }
+    let(:pre_spec) {}
+
+    before do
+      pre_spec
+      get '/api/v1/user/timeline', params: { token: user.api_token }
+    end
+
+    describe 'when new Post has 4 Comments' do
+      let(:pre_spec) do
+        @post = create(:post, user: user, posted_at: Date.parse('2022/8/20'))
+        create_list(:comment, 4, post: @post)
+      end
+
+      it 'should return correct data' do
+        expect(response_body).to eq([
+          {
+            'display_date'  => '20 AUG 22', 
+            'footer'        => '4.0',
+            'record_type'   => 'post',
+            'title'         => @post.title
+          }
+        ])
+      end
+    end
+
+    describe 'when User commented on another Post' do
+    end
+
+    describe 'when User passed 4 stars'
+    describe 'when request for 3 records on page 2'
+    describe 'when there are mixed events'
+  end
 end

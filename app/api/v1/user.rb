@@ -1,7 +1,7 @@
 class Api::V1::User < Grape::API
   namespace :user do
     get :timeline do
-      { status: 'Return User Timeline' }
+      current_user.timeline(*params.slice(:records, :offset))
     end
 
     post :rate do
