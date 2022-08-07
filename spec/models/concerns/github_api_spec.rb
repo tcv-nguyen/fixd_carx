@@ -38,6 +38,7 @@ RSpec.describe GithubApi do
     let(:filename) { "github_api/#{user.github_username}" }
 
     it 'should create GithubEvent for User' do
+      # For when you want you clear VCR and reload
       # clear_vcr(filename)
 
       expect(GithubEvent.count).to eq(0)
@@ -45,7 +46,7 @@ RSpec.describe GithubApi do
       VCR.use_cassette(filename) do
         github_api.fetch_user(user)
       end
-      
+
       expect(GithubEvent.count).to_not eq(0)
     end
   end

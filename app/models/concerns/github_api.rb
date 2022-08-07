@@ -63,7 +63,7 @@ class GithubApi
     def create_event_name(event)
       ref_type = event.dig('payload', 'ref_type')
       return [] unless ref_type == 'repository' # Create new repository
-      ['new_repository']
+      'new_repo'
     end
 
     def push_event_name(event)
@@ -71,13 +71,13 @@ class GithubApi
       # Use generic message instead: get the commits last message as title
       commits = event.dig('payload', 'commits')
       last_commit = commits.last
-      ["commit:#{last_commit.fetch('message', '').gsub("'", "''")}"] # Convert single quote for SQL save
+      "commit::#{last_commit.fetch('message', '').gsub("'", "''")}" # Convert single quote for SQL save
     end
 
     def pull_request_event_name(event)
       action = event.dig('payload', 'action')
       return [] unless %w(opened closed).include?(action) # Opened/Merged new PR
       pr_number = event.dig('payload', 'number')
-      ["#{action == 'opened' ? 'new' : 'merged'}_pull_request:##{pr_number}"]
+      "#{action == 'opened' ? 'new' : 'merged'}_pr::##{pr_number}"
     end
 end

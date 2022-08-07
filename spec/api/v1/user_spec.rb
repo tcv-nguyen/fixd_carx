@@ -167,7 +167,8 @@ describe 'User API V1', type: :request do
         # Create Comment for current_user
         @author = create(:user, rating: 3.5)
         @other_post = create(:post, user: @author)
-        create(:comment, post: @other_post, user: user, commented_at: Date.parse('2022/8/21'))
+        create(:comment, post: @other_post, user: user, commented_at: DateTime.parse('2022/8/21 16:00'))
+        @new_repo = create(:github_event, :new_repo, user: user, event_created_at: DateTime.parse('2022/8/21 22:00'))
       end
 
       it 'should return correct data' do
@@ -180,6 +181,12 @@ describe 'User API V1', type: :request do
           },
           {
             'display_date'  => '21 Aug 22', 
+            'footer'        => @new_repo.repo_name,
+            'record_type'   => 'github_event',
+            'title'         => @new_repo.event_name
+          },
+          {
+            'display_date'  => '21 Aug 22', 
             'footer'        => '3.5',
             'record_type'   => 'comment',
             'title'         => @author.name
@@ -189,6 +196,45 @@ describe 'User API V1', type: :request do
             'footer'        => '4',
             'record_type'   => 'post',
             'title'         => @post.title
+          }
+        ])
+      end
+    end
+
+    describe 'when User has GithubEvent' do
+      let(:pre_spec) do
+        # Reverse order
+        @new_repo = create(:github_event, :new_repo, user: user, event_created_at: Date.parse('2022/8/20'))
+        @new_pr = create(:github_event, :new_pr, user: user, event_created_at: Date.parse('2022/8/21'))
+        @merge_pr = create(:github_event, :merged, user: user, event_created_at: Date.parse('2022/8/22'))
+        @commit = create(:github_event, :commit, user: user, event_created_at: Date.parse('2022/8/23'))
+      end
+
+      it 'should return correct data' do
+        expect(response_body).to eq([
+          {
+            'display_date'  => '23 Aug 22', 
+            'footer'        => @commit.repo_name,
+            'record_type'   => 'github_event',
+            'title'         => @commit.event_name
+          },
+          {
+            'display_date'  => '22 Aug 22', 
+            'footer'        => @merge_pr.repo_name,
+            'record_type'   => 'github_event',
+            'title'         => @merge_pr.event_name
+          },
+          {
+            'display_date'  => '21 Aug 22', 
+            'footer'        => @new_pr.repo_name,
+            'record_type'   => 'github_event',
+            'title'         => @new_pr.event_name
+          },
+          {
+            'display_date'  => '20 Aug 22', 
+            'footer'        => @new_repo.repo_name,
+            'record_type'   => 'github_event',
+            'title'         => @new_repo.event_name
           }
         ])
       end
