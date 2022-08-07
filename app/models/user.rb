@@ -1,8 +1,8 @@
 class User < ApplicationRecord
-  has_many :posts
-  has_many :comments
-  has_many :ratings
-  has_many :github_events
+  has_many :posts, dependent: :destroy
+  has_many :comments, dependent: :destroy
+  has_many :ratings, dependent: :destroy
+  has_many :github_events, dependent: :destroy
 
   before_save :set_high_rating
 
