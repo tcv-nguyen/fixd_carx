@@ -89,7 +89,7 @@ describe 'User API V1', type: :request do
         expect(response_body).to eq([
           {
             'display_date'  => '20 Aug 22', 
-            'footer'        => '4.0',
+            'footer'        => '4',
             'record_type'   => 'post',
             'title'         => @post.title
           }
@@ -149,7 +149,7 @@ describe 'User API V1', type: :request do
         expect(response_body).to eq([
           {
             'display_date'  => @post_2.posted_at.strftime('%d %b %y'), 
-            'footer'        => '0.0',
+            'footer'        => '0',
             'record_type'   => 'post',
             'title'         => @post_2.title
           }
@@ -186,7 +186,7 @@ describe 'User API V1', type: :request do
           },
           {
             'display_date'  => '20 Aug 22', 
-            'footer'        => '4.0',
+            'footer'        => '4',
             'record_type'   => 'post',
             'title'         => @post.title
           }

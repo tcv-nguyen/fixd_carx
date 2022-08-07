@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_many :posts
   has_many :comments
   has_many :ratings
+  has_many :github_events
 
   before_save :set_high_rating
 
@@ -36,7 +37,7 @@ class User < ApplicationRecord
       SELECT DISTINCT(posts.id), 'post' AS record_type, 
           posts.posted_at AS created_date, 
           to_char(posts.posted_at, 'DD Mon YY') AS display_date, 
-          posts.title AS title, COUNT(DISTINCT c.id) AS footer
+          posts.title AS title, COUNT(DISTINCT c.id)::TEXT AS footer
         FROM posts 
           LEFT JOIN comments AS c
             ON posts.id = c.post_id
@@ -46,7 +47,7 @@ class User < ApplicationRecord
         SELECT DISTINCT(comments.id), 'comment' AS record_type, 
           comments.commented_at AS created_date, 
           to_char(comments.commented_at, 'DD Mon YY') AS display_date, 
-          u.name AS title, u.rating AS footer
+          u.name AS title, u.rating::TEXT AS footer
         FROM comments 
           LEFT JOIN posts AS p 
             ON comments.post_id = p.id 
@@ -54,14 +55,21 @@ class User < ApplicationRecord
             ON p.user_id = u.id
         WHERE comments.user_id = #{self.id}
         GROUP BY comments.id, comments.commented_at, u.name, u.rating
-      UNION
+      UNION 
         SELECT users.id, 'rating' AS record_type, 
           users.high_rating_at AS created_date, 
           to_char(users.high_rating_at, 'DD Mon YY') AS display_date, 
-          'Passed 4 stars!' AS title, users.rating AS footer 
+          'Passed 4 stars!' AS title, users.rating::TEXT AS footer 
         FROM users
         WHERE users.id = #{self.id} 
           AND high_rating = 't'
+      UNION 
+        SELECT ge.id, 'github_event' AS record_type, 
+          ge.event_created_at AS created_date, 
+          to_char(ge.event_created_at, 'DD Mon YY') AS display_date, 
+          ge.event_name AS title, ge.repo_name AS footer
+        FROM github_events AS ge
+        WHERE ge.user_id = #{self.id}
       ORDER BY created_date DESC
       LIMIT #{options[:records]}
       OFFSET #{options[:page].to_i - 1}
@@ -73,9 +81,10 @@ class User < ApplicationRecord
 
   def fetch_github_events
     # TODO: Need to set timeout in case the request run too long
-    # Create PR => 'PullRequestEvent' + 'payload' => 'action' => 'opened'
-    # Create repo => 'CreateEvent' + 'payload' => 'ref_type' => 'repository'
-    # Merge PR + Commit => 'PushEvent' + 'payload' => 'commits' => ['message']
+    # or research Github webhook to update events.
+    return if github_username.blank?
+    github_api = GithubApi.new
+    github_api.fetch_user(self)
   end
   
   private
