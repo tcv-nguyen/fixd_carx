@@ -35,13 +35,18 @@ RSpec.describe GithubApi do
   end
 
   describe '#fetch_user(user)' do
+    let(:filename) { "github_api/#{user.github_username}" }
+
     it 'should create GithubEvent for User' do
-      filename = "github_api/#{user.github_username}"
-      clear_vcr(filename)
-      response = 
-        VCR.use_cassette(filename) do
-          github_api.fetch_user(user)
-        end
+      # clear_vcr(filename)
+
+      expect(GithubEvent.count).to eq(0)
+
+      VCR.use_cassette(filename) do
+        github_api.fetch_user(user)
+      end
+      
+      expect(GithubEvent.count).to_not eq(0)
     end
   end
 end
