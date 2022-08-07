@@ -1,4 +1,4 @@
-module Api::V1::Helpers
+module Api::V1::Helpers::Authenticate
   extend Grape::API::Helpers
 
   def authenticate!

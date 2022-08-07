@@ -239,5 +239,11 @@ describe 'User API V1', type: :request do
         ])
       end
     end
+
+    describe 'when there is no data' do
+      it 'should return empty array' do
+        expect(response_body).to eq([])
+      end
+    end
   end
 end

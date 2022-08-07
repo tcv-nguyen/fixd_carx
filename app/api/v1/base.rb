@@ -5,7 +5,7 @@ class Api::V1::Base < Grape::API
     requires :token, type: String, desc: 'API Token'
   end
 
-  helpers Api::V1::Helpers
+  helpers Api::V1::Helpers::Authenticate
 
   before { authenticate! }
 

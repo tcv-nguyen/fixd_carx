@@ -76,6 +76,7 @@ class User < ApplicationRecord
     SQL
 
     result = ActiveRecord::Base.connection.execute(sql.squish).to_a
+    return [] if result.blank?
     result.map { |hash| hash.slice('record_type', 'display_date', 'title', 'footer') }
   end
 

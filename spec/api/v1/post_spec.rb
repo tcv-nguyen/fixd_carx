@@ -95,5 +95,14 @@ describe 'Post API', type: :request do
         })
       end
     end
+
+    describe 'with invalid params' do
+      let(:params) { valid_params.merge(id: blog.id + 1)}
+
+      it 'should return error message with Post cannot found' do
+        expect(response.status).to eq(422)
+        expect(response_message).to eq('Cannot find Post with ID')
+      end
+    end
   end
 end
