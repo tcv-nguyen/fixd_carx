@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_08_07_162325) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_07_175032) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,6 +21,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_07_162325) do
     t.datetime "commented_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "github_events", force: :cascade do |t|
@@ -29,6 +31,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_07_162325) do
     t.string "repo_name"
     t.string "event_name"
     t.datetime "event_created_at"
+    t.index ["user_id"], name: "index_github_events_on_user_id"
   end
 
   create_table "posts", force: :cascade do |t|
@@ -38,6 +41,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_07_162325) do
     t.datetime "posted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
   create_table "ratings", force: :cascade do |t|
@@ -47,6 +51,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_07_162325) do
     t.datetime "rated_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["rater_id"], name: "index_ratings_on_rater_id"
+    t.index ["user_id"], name: "index_ratings_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -61,6 +67,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_07_162325) do
     t.decimal "rating", precision: 10, scale: 1, default: "0.0"
     t.boolean "high_rating", default: false
     t.datetime "high_rating_at"
+    t.index ["api_token"], name: "index_users_on_api_token"
   end
 
 end
