@@ -1,6 +1,7 @@
 class Api::V1::User < Grape::API
   namespace :user do
     get :timeline do
+      current_user.fetch_github_events if current_user.github_username.present?
       current_user.timeline(params.slice(:records, :page).symbolize_keys)
     end
 

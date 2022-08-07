@@ -70,6 +70,13 @@ class User < ApplicationRecord
     result = ActiveRecord::Base.connection.execute(sql.squish).to_a
     result.map { |hash| hash.slice('record_type', 'display_date', 'title', 'footer') }
   end
+
+  def fetch_github_events
+    # TODO: Need to set timeout in case the request run too long
+    # Create PR => 'PullRequestEvent' + 'payload' => 'action' => 'opened'
+    # Create repo => 'CreateEvent' + 'payload' => 'ref_type' => 'repository'
+    # Merge PR + Commit => 'PushEvent' + 'payload' => 'commits' => ['message']
+  end
   
   private
     def set_high_rating
