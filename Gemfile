@@ -47,7 +47,11 @@ group :development, :test do
   gem 'faker'
   gem 'factory_bot_rails'
   gem 'database_cleaner'
+end
+
+group :test do
   gem 'vcr'
+  gem 'webmock'
 end
 
 group :development do

@@ -13,7 +13,7 @@ class GithubApi
     url = "https://api.github.com/users/#{@user.github_username}/events"
     events = HTTParty.get(url)
     arrays = collect_events(events)
-    save_events(arrays)
+    save_events(arrays) if arrays.present?
   end
 
   def collect_events(events)
@@ -27,9 +27,9 @@ class GithubApi
         event.fetch('id', nil),
         event.dig('repo', 'name'),
         DateTime.parse(event.fetch('created_at', Time.current.to_s)),
-        call("#{event_type.underscore}_name", event) # Call according methods to return proper hash for record
+        send("#{event_type.underscore}_name", event) # Call according methods to return proper hash for record
       ]
-      next unless data.length == 4
+      next unless data.compact.length == 5
       array.push(data)
     end
   end
@@ -71,7 +71,7 @@ class GithubApi
       # Use generic message instead: get the commits last message as title
       commits = event.dig('payload', 'commits')
       last_commit = commits.last
-      ["commit:#{last_commit.fetch('message')}"]
+      ["commit:#{last_commit.fetch('message', '').gsub("'", "''")}"] # Convert single quote for SQL save
     end
 
     def pull_request_event_name(event)

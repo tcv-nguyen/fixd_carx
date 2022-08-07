@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GithubApi do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, github_username: 'torvalds') }
   let(:github_api) { GithubApi.new }
   # user_id, event_id, repo_name, event_created_at, event_name
   let(:columns) { %i(user_id event_id repo_name event_created_at event_name) }
@@ -31,6 +31,17 @@ RSpec.describe GithubApi do
       GithubEvent.create(columns.zip(old_record).to_h)
 
       expect { github_api.save_events(arrays) }.to change { GithubEvent.count }.from(1).to(5)
+    end
+  end
+
+  describe '#fetch_user(user)' do
+    it 'should create GithubEvent for User' do
+      filename = "github_api/#{user.github_username}"
+      clear_vcr(filename)
+      response = 
+        VCR.use_cassette(filename) do
+          github_api.fetch_user(user)
+        end
     end
   end
 end
