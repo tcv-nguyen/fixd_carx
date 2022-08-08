@@ -28,3 +28,9 @@ This is an API application. This provides API endpoints. Each endpoint require v
 - Logic to avoid multiple API calls should be apply at front end, but might need logic to prevent it on backend as well.
 - With current User#timeline, the disadvantage is when GithubAPI took too long to response and couldn't return data before timeout. Consider alternative above
 - Need to add logic with update multiple GithubEvent on next page.
+
+- Probably going with Event table where it'll store the Post's ID: This probably faster than using SQL UNION on large database (untested) vs this approach would need extra query for Post's Comments count AS footer
+  + Add callbacks to Post create, Comment create, User#rating.
+  + Point GithubApi to Event table instead of GithubEvent table.
+  + Event table columns: user_id, post_id, title, event_time_at, description(footer)
+  + When load User#timeline, it'll query User#events ORDER BY event_time_at DESC (faster query)
