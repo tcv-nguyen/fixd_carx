@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_08_08_175137) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_09_001200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -33,15 +33,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_08_175137) do
     t.string "description"
     t.datetime "event_time_at"
     t.index ["user_id", "eventable_id", "eventable_type"], name: "index_events_on_user_id_and_eventable_id_and_eventable_type", unique: true
-  end
-
-  create_table "github_events", force: :cascade do |t|
-    t.integer "user_id"
-    t.string "event_id"
-    t.string "repo_name"
-    t.string "event_name"
-    t.datetime "event_created_at"
-    t.index ["user_id"], name: "index_github_events_on_user_id"
   end
 
   create_table "posts", force: :cascade do |t|
