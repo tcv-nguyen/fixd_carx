@@ -88,10 +88,10 @@ describe 'User API V1', type: :request do
       it 'should return correct data' do
         expect(response_body).to eq([
           {
-            'display_date'  => '20 Aug 22', 
-            'footer'        => '4',
-            'record_type'   => 'post',
-            'title'         => @post.title
+            'description'     => '4',
+            'event_time_at'   => '20 Aug 22', 
+            'eventable_type'  => 'Post',
+            'title'           => @post.title
           }
         ])
       end
@@ -107,10 +107,10 @@ describe 'User API V1', type: :request do
       it 'should return correct data' do
         expect(response_body).to eq([
           {
-            'display_date'  => '21 Aug 22', 
-            'footer'        => '3.0',
-            'record_type'   => 'comment',
-            'title'         => @author.name
+            'description'     => '3.0',
+            'event_time_at'   => '21 Aug 22', 
+            'eventable_type'  => 'Comment',
+            'title'           => @author.name
           }
         ])
       end
@@ -122,10 +122,10 @@ describe 'User API V1', type: :request do
       it 'should return correct data' do
         expect(response_body).to eq([
           {
-            'display_date'  => '22 Aug 22', 
-            'footer'        => '4.0',
-            'record_type'   => 'rating',
-            'title'         => 'Passed 4 stars!'
+            'description'     => '4.0',
+            'event_time_at'   => '22 Aug 22', 
+            'eventable_type'  => 'Rating',
+            'title'           => 'Passed 4 stars!'
           }
         ])
       end
@@ -140,7 +140,8 @@ describe 'User API V1', type: :request do
     end
 
     describe 'when request for 1 records on page 2' do
-      let(:params) { valid_params.merge(records: 1, page: 2) }
+      # page = offset (start as 0)
+      let(:params) { valid_params.merge(records: 1, page: 1) }
       let(:pre_spec) do
         @post_1, @post_2, @post_3 = create_list(:post, 3, user: user)
       end
@@ -148,10 +149,10 @@ describe 'User API V1', type: :request do
       it 'should return correct data' do
         expect(response_body).to eq([
           {
-            'display_date'  => @post_2.posted_at.strftime('%d %b %y'), 
-            'footer'        => '0',
-            'record_type'   => 'post',
-            'title'         => @post_2.title
+            'description'     => '0',
+            'event_time_at'   => @post_2.posted_at.strftime('%d %b %y'), 
+            'eventable_type'  => 'Post',
+            'title'           => @post_2.title
           }
         ])
       end
@@ -168,34 +169,34 @@ describe 'User API V1', type: :request do
         @author = create(:user, rating: 3.5)
         @other_post = create(:post, user: @author)
         create(:comment, post: @other_post, user: user, commented_at: DateTime.parse('2022/8/21 16:00'))
-        @new_repo = create(:github_event, :new_repo, user: user, event_created_at: DateTime.parse('2022/8/21 22:00'))
+        @new_repo = create(:event, :new_repo, user: user, event_time_at: DateTime.parse('2022/8/21 22:00'))
       end
 
       it 'should return correct data' do
         expect(response_body).to eq([
           {
-            'display_date'  => '22 Aug 22', 
-            'footer'        => '4.4',
-            'record_type'   => 'rating',
-            'title'         => 'Passed 4 stars!'
+            'description'     => '4.4',
+            'event_time_at'   => '22 Aug 22', 
+            'eventable_type'  => 'Rating',
+            'title'           => 'Passed 4 stars!'
           },
           {
-            'display_date'  => '21 Aug 22', 
-            'footer'        => @new_repo.repo_name,
-            'record_type'   => 'github_event',
-            'title'         => @new_repo.event_name
+            'description'     => @new_repo.description,
+            'event_time_at'   => '21 Aug 22', 
+            'eventable_type'  => 'GithubEvent',
+            'title'           => @new_repo.title
           },
           {
-            'display_date'  => '21 Aug 22', 
-            'footer'        => '3.5',
-            'record_type'   => 'comment',
-            'title'         => @author.name
+            'description'     => '3.5',
+            'event_time_at'   => '21 Aug 22', 
+            'eventable_type'  => 'Comment',
+            'title'           => @author.name
           },
           {
-            'display_date'  => '20 Aug 22', 
-            'footer'        => '4',
-            'record_type'   => 'post',
-            'title'         => @post.title
+            'description'     => '4',
+            'event_time_at'   => '20 Aug 22', 
+            'eventable_type'  => 'Post',
+            'title'           => @post.title
           }
         ])
       end
@@ -204,37 +205,37 @@ describe 'User API V1', type: :request do
     describe 'when User has GithubEvent' do
       let(:pre_spec) do
         # Reverse order
-        @new_repo = create(:github_event, :new_repo, user: user, event_created_at: Date.parse('2022/8/20'))
-        @new_pr = create(:github_event, :new_pr, user: user, event_created_at: Date.parse('2022/8/21'))
-        @merge_pr = create(:github_event, :merged, user: user, event_created_at: Date.parse('2022/8/22'))
-        @commit = create(:github_event, :commit, user: user, event_created_at: Date.parse('2022/8/23'))
+        @new_repo = create(:event, :new_repo, user: user, event_time_at: Date.parse('2022/8/20'))
+        @new_pr = create(:event, :new_pr, user: user, event_time_at: Date.parse('2022/8/21'))
+        @merge_pr = create(:event, :merged, user: user, event_time_at: Date.parse('2022/8/22'))
+        @commit = create(:event, :commit, user: user, event_time_at: Date.parse('2022/8/23'))
       end
 
       it 'should return correct data' do
         expect(response_body).to eq([
           {
-            'display_date'  => '23 Aug 22', 
-            'footer'        => @commit.repo_name,
-            'record_type'   => 'github_event',
-            'title'         => @commit.event_name
+            'description'     => @commit.description,
+            'event_time_at'   => '23 Aug 22', 
+            'eventable_type'  => 'GithubEvent',
+            'title'           => @commit.title
           },
           {
-            'display_date'  => '22 Aug 22', 
-            'footer'        => @merge_pr.repo_name,
-            'record_type'   => 'github_event',
-            'title'         => @merge_pr.event_name
+            'description'     => @merge_pr.description,
+            'event_time_at'   => '22 Aug 22', 
+            'eventable_type'  => 'GithubEvent',
+            'title'           => @merge_pr.title
           },
           {
-            'display_date'  => '21 Aug 22', 
-            'footer'        => @new_pr.repo_name,
-            'record_type'   => 'github_event',
-            'title'         => @new_pr.event_name
+            'description'     => @new_pr.description,
+            'event_time_at'   => '21 Aug 22', 
+            'eventable_type'  => 'GithubEvent',
+            'title'           => @new_pr.title
           },
           {
-            'display_date'  => '20 Aug 22', 
-            'footer'        => @new_repo.repo_name,
-            'record_type'   => 'github_event',
-            'title'         => @new_repo.event_name
+            'description'     => @new_repo.description,
+            'event_time_at'   => '20 Aug 22', 
+            'eventable_type'  => 'GithubEvent',
+            'title'           => @new_repo.title
           }
         ])
       end

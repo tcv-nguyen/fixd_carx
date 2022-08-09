@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_08_07_175032) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_08_175137) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -23,6 +23,16 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_07_175032) do
     t.datetime "updated_at", null: false
     t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "eventable_type"
+    t.string "eventable_id"
+    t.string "title"
+    t.string "description"
+    t.datetime "event_time_at"
+    t.index ["user_id", "eventable_id", "eventable_type"], name: "index_events_on_user_id_and_eventable_id_and_eventable_type", unique: true
   end
 
   create_table "github_events", force: :cascade do |t|

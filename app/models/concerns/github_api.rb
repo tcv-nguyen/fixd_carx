@@ -22,14 +22,18 @@ class GithubApi
       # Collect only new repository, new PR, merge PR and commit events
       next unless EVENTS.include?(event_type)
       # Data format: user_id, event_id, repo_name, event_created_at, event_name
+      # repo_name => title, event_name => description
+      # Data format: user_id, eventable_type, eventable_id, title, event_time_at, 
+        # description
       data = [
         @user.id,
+        'GithubEvent',
         event.fetch('id', nil),
         event.dig('repo', 'name'),
         DateTime.parse(event.fetch('created_at', Time.current.to_s)),
         send("#{event_type.underscore}_name", event) # Call according methods to return proper hash for record
       ]
-      next unless data.compact.length == 5
+      next unless data.compact.length == 6
       array.push(data)
     end
   end
@@ -40,21 +44,27 @@ class GithubApi
       # event IDs that not exists in the table
     # generate SQL and save all data as once
       # For speed since this usually called from API endpoint
-    # Array of data_array format: user_id, event_id, repo_name, event_created_at, event_name
-    event_ids = arrays.map { |array| array[1] }
-    existed_ids = @user.github_events.where(event_id: event_ids).pluck(:event_id)
+    # Array of data_array format:
+    # Data format: user_id, eventable_type, eventable_id, title, event_time_at, 
+      # description
+    event_ids = arrays.map { |array| array[2] }
+    existed_ids = @user.events.where(eventable_id: event_ids).pluck(:eventable_id)
     new_event_ids = event_ids - existed_ids
-    new_data = arrays.select { |array| new_event_ids.include?(array[1]) }
+    new_data = arrays.select { |array| new_event_ids.include?(array[2]) } # array[2] = event_id
     # Re-format new_data into SQL values
-    values = new_data.map do |array| 
-      "(#{array.map { |value| "'#{value}'" }.join(', ')})" 
+    values = new_data.map do |array|
+      "(#{array.map { |value| "'#{value}'" }.join(', ')})"
     end.join(', ')
+    return if values.blank?
     sql = <<-SQL
       INSERT INTO 
-        github_events (user_id, event_id, repo_name, event_created_at, event_name)
+        events (user_id, eventable_type, eventable_id, title, event_time_at, description)
       VALUES #{values}
     SQL
+
     ActiveRecord::Base.connection.execute(sql.squish)
+    # results = ActiveRecord::Base.connection.execute(sql.squish)
+    # binding.pry
   end
 
   private

@@ -2,9 +2,10 @@ class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :ratings, dependent: :destroy
-  has_many :github_events, dependent: :destroy
+  has_many :events, dependent: :destroy
 
   before_save :set_high_rating
+  after_save :add_event, if: -> { high_rating }
 
   def api_token_expired?
     self.api_token_expired_at.blank? || self.api_token_expired_at < Time.current
@@ -90,8 +91,20 @@ class User < ApplicationRecord
   
   private
     def set_high_rating
-      return if self.high_rating? # Should not change high_rating status if already pass rating 4
-      self.high_rating = self.rating >= 4
+      # Should not change high_rating status if already pass rating 4
+      # or lower than 4
+      return if self.high_rating? || self.rating < 4
+      self.high_rating = true
       self.high_rating_at ||= Time.current
+    end
+
+    def add_event
+      events.create(
+        eventable_type: 'Rating',
+        eventable_id: self.id,
+        event_time_at: self.high_rating_at,
+        title: 'Passed 4 stars!',
+        description: self.rating
+      )
     end
 end
